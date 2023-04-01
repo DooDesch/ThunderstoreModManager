@@ -3,3 +3,4 @@ currentPackages.json
 .env
 node_modules
 zipped-packages
+config
