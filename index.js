@@ -24,8 +24,6 @@ program
         console.log(`Total installed packages: ${totalInstalledMods}`)
     });
 
-
-
 program
     .command('update [package]')
     .description('Update all installed packages or a specific package')

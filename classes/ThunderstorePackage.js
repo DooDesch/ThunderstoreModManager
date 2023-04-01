@@ -94,7 +94,7 @@ class ThunderstorePackage {
             fs.rmSync(resolvedModInstallPath, { recursive: true });
         }
 
-        console.log(`[${path.basename(__filename)}] :: Extracting ${fullName} ...`)
+        console.log(`[${path.basename(__filename)}] :: Extracting ${fullName}...`)
 
         return new Promise(async (resolve, reject) => {
             const extract = require('extract-zip');
