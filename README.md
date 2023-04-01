@@ -7,3 +7,7 @@ Thunderstore Nodejs Mod Manager is a mod manager that allows you to install and 
 - Install mods from Thunderstore
 - Update installed mods
 - Uninstall mods
+
+## Example use
+
+> $ node index install Jotunn
