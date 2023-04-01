@@ -4,11 +4,11 @@ const path = require('path');
 
 class PackageUpdater {
     API_URL = 'https://valheim.thunderstore.io/api/v1/package/';
+    packageInfoPath = 'currentPackages.json'
+    done = false;
 
     constructor() {
         this.updatePackages();
-
-        this.packageInfoPath = 'currentPackages.json';
     }
 
 
@@ -17,14 +17,20 @@ class PackageUpdater {
             .then(response => response.data);
     }
 
-    writePackagesToFile(packages) {
-        fs.writeFile(this.packageInfoPath, JSON.stringify(packages), (err) => {
-            if (err) throw err;
-            console.log(`[${path.basename(__filename)}] :: Successfully updated packages!`);
+    async writePackagesToFile(packages) {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(this.packageInfoPath, JSON.stringify(packages), (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                };
+                console.log(`[${path.basename(__filename)}] :: Successfully updated packages!`);
+                resolve();
+            });
         });
     }
 
-    updatePackages() {
+    async updatePackages() {
         if (fs.existsSync(this.packageInfoPath)) {
             const fileStats = fs.statSync(this.packageInfoPath);
             const currentTime = new Date().getTime();
@@ -32,9 +38,9 @@ class PackageUpdater {
 
             if (fileAge > 1) {
                 console.log(`[${path.basename(__filename)}] :: File is older than 1 hour. Updating packages...`);
-                this.retrievePackages()
-                    .then(packages => {
-                        this.writePackagesToFile(packages);
+                await this.retrievePackages()
+                    .then(async packages => {
+                        await this.writePackagesToFile(packages);
                     })
                     .catch(error => {
                         console.log(error);
@@ -44,14 +50,26 @@ class PackageUpdater {
             }
         } else {
             console.log(`[${path.basename(__filename)}] :: File does not exist. Creating file and updating packages...`);
-            this.retrievePackages()
-                .then(packages => {
-                    this.writePackagesToFile(packages);
+            await this.retrievePackages()
+                .then(async packages => {
+                    await this.writePackagesToFile(packages);
                 })
                 .catch(error => {
                     console.log(error);
                 });
         }
+        this.done = true;
+    }
+
+    isDone() {
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+                if (this.done) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
     }
 }
 
