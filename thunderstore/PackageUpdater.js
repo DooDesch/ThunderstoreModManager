@@ -13,7 +13,6 @@ class PackageUpdater {
 
 
     retrievePackages() {
-        console.log(this.API_URL)
         return axios.get(this.API_URL)
             .then(response => response.data);
     }
