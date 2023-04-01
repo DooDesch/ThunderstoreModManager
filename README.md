@@ -11,3 +11,7 @@ Thunderstore Nodejs Mod Manager is a mod manager that allows you to install and 
 ## Example use
 
 > $ node index install Jotunn
+
+## Install
+
+- Copy `.env-example` to `.env`
