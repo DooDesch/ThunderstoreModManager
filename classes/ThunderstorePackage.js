@@ -86,6 +86,7 @@ class ThunderstorePackage {
 
     async extractPackage(tsPackage) {
         const { fullName, filePath } = tsPackage;
+
         const resolvedFilePath = require('path').resolve(filePath);
         const resolvedModInstallPath = require('path').resolve(`${this.modInstallPath}/${fullName}`);
 
@@ -106,6 +107,8 @@ class ThunderstorePackage {
                     return;
                 }
             });
+
+            console.log(`[${path.basename(__filename)}] :: Successfully extracted ${fullName}!`);
             resolve();
         });
     }

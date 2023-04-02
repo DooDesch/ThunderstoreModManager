@@ -7,6 +7,8 @@ class ThunderstorePackageHandler {
 
         this.thunderstorePackage = thunderstorePackage;
         this.isInitialized = false;
+
+        this.installedPackages = [];
     }
 
     async init() {
@@ -25,6 +27,8 @@ class ThunderstorePackageHandler {
     }
 
     async installPackageByName(packageName) {
+        if (this.installedPackages.includes(packageName)) return;
+
         return new Promise(async (resolve, reject) => {
             await this.init();
 
@@ -57,6 +61,7 @@ class ThunderstorePackageHandler {
                 .then(async () => {
                     await this.thunderstorePackage.extractPackage(tsPackage);
                     await this.thunderstorePackage.saveInstalledPackages(packageName, tsPackage.version);
+                    this.installedPackages.push(packageName);
                     resolve();
                 })
                 .catch((err) => {
