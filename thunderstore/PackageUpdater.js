@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 class PackageUpdater {
-    API_URL = 'https://valheim.thunderstore.io/api/v1/package/';
+    API_URL = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/api/v1/package/`;
     packageInfoPath = 'currentPackages.json'
     done = false;
 

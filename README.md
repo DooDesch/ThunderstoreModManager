@@ -15,3 +15,8 @@ Thunderstore Nodejs Mod Manager is a mod manager that allows you to install and 
 ## Install
 
 - Copy `.env-example` to `.env`
+
+## Change Thunderstore Game to pull from
+
+- Open `.env`
+- Update `GAME` variable to any Thunderstore Domain Prefix
