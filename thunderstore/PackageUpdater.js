@@ -3,11 +3,26 @@ const fs = require('fs');
 const path = require('path');
 
 class PackageUpdater {
-    API_URL = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/api/v1/package/`;
+    game = process.env.GAME.toLowerCase();
     packageInfoPath = 'currentPackages.json'
     done = false;
 
     constructor() {
+        const riskOfRain2Variants = [
+            'riskofrain2',
+            'risk-of-rain-2',
+            'riskofrain',
+            'risk-of-rain',
+            'ror2',
+            'ror',
+        ]
+
+        if (riskOfRain2Variants.includes(this.game)) {
+            this.API_URL = 'https://thunderstore.io/api/v1/package/';
+        } else {
+            this.API_URL = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/api/v1/package/`;
+        }
+
         this.updatePackages();
     }
 
