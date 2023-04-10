@@ -1,7 +1,6 @@
-
-const PackageUpdater = require('../thunderstore/PackageUpdater');
-const ThunderstorePackageHandler = require('./ThunderstorePackageHandler');
-const Modpack = require('./Modpack');
+import PackageUpdater from '../thunderstore/PackageUpdater.js';
+import ThunderstorePackageHandler from './ThunderstorePackageHandler.js';
+import Modpack from './Modpack.js';
 
 class Action {
     constructor() {
@@ -82,4 +81,4 @@ class Action {
     }
 }
 
-module.exports = Action;
+export default Action;

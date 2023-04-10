@@ -1,8 +1,9 @@
-const { program } = require('commander');
+import { program } from 'commander';
+import dotenv from 'dotenv';
+import Action from './classes/Action.js';
 
-require('dotenv').config();
+dotenv.config();
 
-const Action = require('./classes/Action');
 const action = new Action();
 
 program.version('1.0.0');

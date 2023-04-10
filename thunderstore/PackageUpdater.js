@@ -1,6 +1,9 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 
 class PackageUpdater {
     game = process.env.GAME.toLowerCase();
@@ -88,4 +91,4 @@ class PackageUpdater {
     }
 }
 
-module.exports = PackageUpdater;
+export default PackageUpdater;

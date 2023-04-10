@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 class PackageInfo {
     constructor(packageName) {
         this.packageName = packageName;
@@ -7,7 +9,8 @@ class PackageInfo {
     getPackageInfoFromCurrentPackages(packageName) {
         try {
             // Load "currentPackages.json" into a variable called currentPackages
-            const currentPackages = require('../currentPackages.json');
+            const currentPackagesFile = fs.readFileSync('./currentPackages.json', 'utf8');
+            const currentPackages = JSON.parse(currentPackagesFile);
 
             // Find the package with the given name
             const thunderstorePackage = currentPackages.find(pkg => pkg.name === packageName);
@@ -62,4 +65,4 @@ class PackageInfo {
     }
 }
 
-module.exports = PackageInfo;
+export default PackageInfo;

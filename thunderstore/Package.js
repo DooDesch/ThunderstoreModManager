@@ -98,4 +98,4 @@ class Package {
     }
 }
 
-module.exports = Package;
+export default Package;

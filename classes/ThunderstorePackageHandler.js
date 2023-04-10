@@ -1,17 +1,21 @@
-const path = require('path');
-const fs = require('fs');
+import fs from 'fs';
+import path from 'path';
+import ThunderstorePackage from './ThunderstorePackage.js';
+import PackageInfo from '../thunderstore/PackageInfo.js';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 
 class ThunderstorePackageHandler {
     isInitialized = false;
     installedPackages = [];
 
     constructor() {
-        const ThunderstorePackage = require('./ThunderstorePackage');
         this.thunderstorePackage = new ThunderstorePackage();
     }
 
     init() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             if (this.isInitialized) {
                 resolve();
                 return;
@@ -91,10 +95,7 @@ class ThunderstorePackageHandler {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            // Get packageInfo
-            const PackageInfo = require('../thunderstore/PackageInfo');
             const packageInfo = new PackageInfo(packageName);
-
             await this.thunderstorePackage.removeInstalledPackage(packageName, packageInfo.details.fullName);
 
             resolve();
@@ -135,7 +136,6 @@ class ThunderstorePackageHandler {
                  * Create dependency array
                  */
                 for (const packageName in installedPackages) {
-                    const PackageInfo = require('../thunderstore/PackageInfo');
                     const packageInfo = new PackageInfo(packageName);
 
                     const name = packageInfo.details.fullName;
@@ -210,4 +210,4 @@ class ThunderstorePackageHandler {
     }
 }
 
-module.exports = ThunderstorePackageHandler;
+export default ThunderstorePackageHandler;

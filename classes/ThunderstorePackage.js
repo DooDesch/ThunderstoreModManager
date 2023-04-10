@@ -1,12 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 
 class ThunderstorePackage {
     isInitialized = false;
     fileName = 'thunderstorePackage.json';
 
     async init() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             const packageJsonExists = await this.checkIfPackageJsonExists();
             if (!packageJsonExists) {
                 this.createPackageJson();
@@ -33,7 +36,7 @@ class ThunderstorePackage {
     }
 
     async checkIfPackageJsonExists() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             fs.access(this.fileName, fs.constants.F_OK, (err) => {
                 if (err) {
                     console.log(`[${path.basename(__filename)}] :: ${this.fileName} does not exists, creating it now...`);
@@ -156,4 +159,4 @@ class ThunderstorePackage {
     }
 }
 
-module.exports = ThunderstorePackage;
+export default ThunderstorePackage;
