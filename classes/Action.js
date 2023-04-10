@@ -6,7 +6,6 @@ class Action {
     constructor() {
         this.packageUpdater = new PackageUpdater();
         this.thunderstorePackageHandler = new ThunderstorePackageHandler();
-        this.modpack = new Modpack();
     }
 
     async init() {
@@ -74,7 +73,7 @@ class Action {
             await this.init();
 
             if (updateManifest) await this.createManifest();
-            await this.modpack.createModpack();
+            await new Modpack.createModpack();
 
             resolve();
         });

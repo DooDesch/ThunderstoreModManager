@@ -3,6 +3,7 @@ import path from 'path';
 import ThunderstorePackage from './ThunderstorePackage.js';
 import PackageInfo from '../thunderstore/PackageInfo.js';
 import Package from '../thunderstore/Package.js';
+import inquirer from 'inquirer';
 
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -99,6 +100,23 @@ class ThunderstorePackageHandler {
         });
     }
 
+    askForManifestDetail(detailName, defaultValue) {
+        return new Promise(async (resolve) => {
+            const questions = [
+                {
+                    type: 'input',
+                    name: 'detail',
+                    message: `Enter ${detailName}:`,
+                    default: defaultValue,
+                }
+            ];
+
+            inquirer.prompt(questions).then(async (answers) => {
+                resolve(answers.detail);
+            });
+        });
+    }
+
     createManifest() {
         return new Promise(async (resolve, reject) => {
             await this.init();
@@ -106,14 +124,7 @@ class ThunderstorePackageHandler {
             const manifestFileName = "manifest.json";
             const manifestDirectory = process.env.MODPACK_FOLDER || "./modpack";
 
-            let manifest = {
-                "name": process.env.MANIFEST_NAME || "Modpack",
-                "version_number": process.env.MANIFEST_VERSION || "1.0.0",
-                "website_url": process.env.MANIFEST_WEBSITE_URL || "https://github.com/thunderstore-io",
-                "description": process.env.MANIFEST_DESCRIPTION || "Modpack Description",
-                "dependencies": [],
-            }
-
+            let manifest = {};
             let hasPatchChanges = false;
             let hasMinorChanges = false;
             const dependencyArray = [];
@@ -167,6 +178,14 @@ class ThunderstorePackageHandler {
 
                     if (manifest.dependencies.length !== dependencyArray.length) {
                         hasMinorChanges = true;
+                    }
+                } else {
+                    manifest = {
+                        "name": process.env.MANIFEST_NAME || await this.askForManifestDetail("Modpack Name", "Modpack"),
+                        "version_number": process.env.MANIFEST_VERSION || await this.askForManifestDetail("Modpack Version", "1.0.0"),
+                        "website_url": process.env.MANIFEST_WEBSITE_URL || await this.askForManifestDetail("Modpack Website URL", "https://github.com/thunderstore-io"),
+                        "description": process.env.MANIFEST_DESCRIPTION || await this.askForManifestDetail("Modpack Description", "A modpack made with Thunderstore.io"),
+                        "dependencies": [],
                     }
                 }
 
