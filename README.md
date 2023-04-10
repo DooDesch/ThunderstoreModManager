@@ -72,9 +72,9 @@ The `.env` file contains several configuration options that you can customize to
 Contributions to this project are welcome! To contribute:
 
 1. Fork the repository
-2. Create a new branch: git checkout -b my-new-feature
-3. Make changes and commit them: git commit -am 'Add some feature'
-4. Push to the branch: git push origin my-new-feature
+2. Create a new branch: `git checkout -b my-new-feature`
+3. Make changes and commit them: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request
 
 ## License
