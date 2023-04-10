@@ -25,7 +25,7 @@ class Modpack {
                 const manifestFileContent = fs.readFileSync(path.join(modpackDirectory, manifestFileName), 'utf-8');
                 const manifest = JSON.parse(manifestFileContent);
                 const modpackName = manifest.name;
-                const modpackVersion = manifest.version;
+                const modpackVersion = manifest.version_number;
 
                 // Create zip file using adm-zip
                 const zip = new AdmZip();
