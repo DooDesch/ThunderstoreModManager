@@ -2,32 +2,30 @@ const path = require('path');
 const fs = require('fs');
 
 class ThunderstorePackageHandler {
+    isInitialized = false;
+    installedPackages = [];
+
     constructor() {
         const ThunderstorePackage = require('./ThunderstorePackage');
-        const thunderstorePackage = new ThunderstorePackage();
-
-        this.thunderstorePackage = thunderstorePackage;
-        this.isInitialized = false;
-
-        this.installedPackages = [];
+        this.thunderstorePackage = new ThunderstorePackage();
     }
 
-    async init() {
+    init() {
         return new Promise(async (resolve, reject) => {
             if (this.isInitialized) {
                 resolve();
                 return;
             }
 
-            this.isInitialized = true;
             await this.thunderstorePackage.init();
+            this.isInitialized = true;
 
             console.log(`[${path.basename(__filename)}] :: ThunderstorePackageHandler initialized`)
             resolve();
         });
     }
 
-    async installPackageByName(packageName) {
+    installPackageByName(packageName) {
         if (this.installedPackages.includes(packageName)) return;
 
         return new Promise(async (resolve, reject) => {
@@ -72,7 +70,7 @@ class ThunderstorePackageHandler {
         });
     }
 
-    async updateInstalledPackages() {
+    updateInstalledPackages() {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
@@ -89,7 +87,7 @@ class ThunderstorePackageHandler {
         });
     }
 
-    async removePackageByName(packageName) {
+    removePackageByName(packageName) {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
@@ -103,12 +101,12 @@ class ThunderstorePackageHandler {
         });
     }
 
-    async createManifest() {
+    createManifest() {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const manifestFileName = process.env.MANIFEST_FILE_NAME || "manifest.json";
-            const manifestDirectory = process.env.MANIFEST_FOLDER || "./manifest";
+            const manifestFileName = "manifest.json";
+            const manifestDirectory = process.env.MODPACK_FOLDER || "./modpack";
 
             let manifest = {
                 "name": process.env.MANIFEST_NAME || "Modpack",
@@ -128,7 +126,7 @@ class ThunderstorePackageHandler {
                 /**
                  * Create manifest directory if it doesn't exist
                  */
-                const directoryExists = await fs.existsSync(manifestDirectory);
+                const directoryExists = fs.existsSync(manifestDirectory);
                 if (!directoryExists) {
                     fs.mkdirSync(manifestDirectory);
                 }
@@ -150,12 +148,12 @@ class ThunderstorePackageHandler {
                  * If it does, compare the dependencies
                  * If there are any changes, tell to update the minor version
                  */
-                const filePath = path.join(process.env.MANIFEST_FOLDER, manifestFileName);
-                const fileExists = await fs.existsSync(filePath);
+                const filePath = path.join(process.env.MODPACK_FOLDER, manifestFileName);
+                const fileExists = fs.existsSync(filePath);
                 if (fileExists) {
                     console.log(`[${path.basename(__filename)}] :: Manifest already exists, updating dependencies...`);
 
-                    const manifestFileContent = await fs.readFileSync(filePath, 'utf-8');
+                    const manifestFileContent = fs.readFileSync(filePath, 'utf-8');
                     manifest = JSON.parse(manifestFileContent);
 
                     const additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
@@ -201,7 +199,7 @@ class ThunderstorePackageHandler {
                 /**
                  * Save the manifest
                  */
-                await fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));
+                fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));
                 const createdUpdatedString = fileExists ? "updated" : "created";
                 console.log(`[${path.basename(__filename)}] :: Manifest ${createdUpdatedString} successfully!`);
                 resolve();

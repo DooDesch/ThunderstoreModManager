@@ -42,4 +42,11 @@ program
         await action.createManifest();
     });
 
+program
+    .command('create:modpack [updateManifest]')
+    .description('Create a modpack using the dependencies in your thunderstorePackage.json')
+    .action(async (updateManifest = true) => {
+        await action.createModpack(updateManifest);
+    });
+
 program.parse(process.argv);

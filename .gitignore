@@ -5,3 +5,6 @@ node_modules
 zipped-packages
 config
 modpack
+dist
+*.zip
+*.dll

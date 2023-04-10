@@ -1,11 +1,13 @@
 
 const PackageUpdater = require('../thunderstore/PackageUpdater');
 const ThunderstorePackageHandler = require('./ThunderstorePackageHandler');
+const Modpack = require('./Modpack');
 
 class Action {
     constructor() {
         this.packageUpdater = new PackageUpdater();
         this.thunderstorePackageHandler = new ThunderstorePackageHandler();
+        this.modpack = new Modpack();
     }
 
     async init() {
@@ -63,6 +65,17 @@ class Action {
             await this.init();
 
             await this.thunderstorePackageHandler.createManifest();
+
+            resolve();
+        });
+    }
+
+    createModpack(updateManifest) {
+        return new Promise(async (resolve) => {
+            await this.init();
+
+            if (updateManifest) await this.createManifest();
+            await this.modpack.createModpack();
 
             resolve();
         });

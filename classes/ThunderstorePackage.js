@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 class ThunderstorePackage {
-    fileName = 'thunderstorePackage.json';
     isInitialized = false;
+    fileName = 'thunderstorePackage.json';
 
     async init() {
         return new Promise(async (resolve, reject) => {
