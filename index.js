@@ -46,7 +46,30 @@ program
         const ThunderstorePackageHandler = require('./classes/ThunderstorePackageHandler');
         const thunderstorePackageHandler = new ThunderstorePackageHandler();
 
-        thunderstorePackageHandler.removePackageByName(packageName);
+        await thunderstorePackageHandler.removePackageByName(packageName);
+    });
+
+program
+    .command('create:manifest')
+    .description('Create a manifest file for your mod or modpack using the dependencies in your thunderstorePackage.json')
+    .action(async () => {
+        createManifest();
+    });
+
+program
+    .command('update:manifest')
+    .description('Update the dependencies in your manifest file using the dependencies in your thunderstorePackage.json')
+    .action(async () => {
+        createManifest();
     });
 
 program.parse(process.argv);
+
+const createManifest = async () => {
+    await packageUpdater.isDone();
+
+    const ThunderstorePackageHandler = require('./classes/ThunderstorePackageHandler');
+    const thunderstorePackageHandler = new ThunderstorePackageHandler();
+
+    await thunderstorePackageHandler.createManifest();
+}

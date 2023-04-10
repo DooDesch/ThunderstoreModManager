@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 class ThunderstorePackageHandler {
     constructor() {
@@ -99,6 +100,59 @@ class ThunderstorePackageHandler {
             await this.thunderstorePackage.removeInstalledPackage(packageName, packageInfo.details.fullName);
 
             resolve();
+        });
+    }
+
+    async createManifest() {
+        return new Promise(async (resolve, reject) => {
+            await this.init();
+
+            try {
+                const installedPackages = this.thunderstorePackage.getInstalledPackages();
+
+                const manifestDirectory = process.env.MANIFEST_FOLDER || "./manifest";
+                const directoryExists = await fs.existsSync(manifestDirectory);
+                if (!directoryExists) {
+                    fs.mkdirSync(manifestDirectory);
+                }
+
+                const manifestFileName = process.env.MANIFEST_FILE_NAME || "manifest.json";
+                let manifest = {
+                    "name": process.env.MANIFEST_NAME || "Modpack",
+                    "version_number": process.env.MANIFEST_VERSION || "1.0.0",
+                    "website_url": process.env.MANIFEST_WEBSITE_URL || "https://github.com/thunderstore-io",
+                    "description": process.env.MANIFEST_DESCRIPTION || "Modpack Description",
+                    "dependencies": [],
+                }
+
+                const filePath = path.join(process.env.MANIFEST_FOLDER, manifestFileName);
+                const fileExists = await fs.existsSync(filePath);
+                if (fileExists) {
+                    console.log(`[${path.basename(__filename)}] :: Manifest already exists, updating dependencies...`);
+
+                    const manifestFileContent = await fs.readFileSync(filePath, 'utf-8');
+                    manifest = JSON.parse(manifestFileContent);
+                }
+
+                const dependencyArray = [];
+                for (const packageName in installedPackages) {
+                    const PackageInfo = require('../thunderstore/PackageInfo');
+                    const packageInfo = new PackageInfo(packageName);
+
+                    const name = packageInfo.details.fullName;
+                    const version = packageInfo.details.versionNumber;
+                    dependencyArray.push(`${name}-${version}}`);
+                }
+
+                manifest.dependencies = dependencyArray;
+
+                await fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));
+                const createdUpdatedString = fileExists ? "updated" : "created";
+                console.log(`[${path.basename(__filename)}] :: Manifest ${createdUpdatedString} successfully!`);
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 }
