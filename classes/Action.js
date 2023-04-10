@@ -13,17 +13,22 @@ class Action {
     }
 
     installPackageByName(packageName) {
-        return new Promise(async (resolve) => {
-            await this.init();
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.init();
 
-            await this.installOrUpdatePackageByName(packageName);
+                await this.installOrUpdatePackageByName(packageName);
 
-            const installedPackages = this.thunderstorePackageHandler.thunderstorePackage.getInstalledPackages();
-            const totalInstalledMods = Object.keys(installedPackages).length
-            console.log('-------------------------')
-            console.log(`Total installed packages: ${totalInstalledMods}`)
+                const installedPackages = this.thunderstorePackageHandler.thunderstorePackage.getInstalledPackages();
+                const totalInstalledMods = Object.keys(installedPackages).length
+                console.log('-------------------------')
+                console.log(`Total installed packages: ${totalInstalledMods}`)
 
-            resolve();
+                resolve();
+            } catch (error) {
+                console.error(`Error installing package '${packageName}':`, error);
+                reject(error);
+            }
         });
     }
 
