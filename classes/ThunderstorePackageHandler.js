@@ -125,11 +125,17 @@ class ThunderstorePackageHandler {
             try {
                 const installedPackages = this.thunderstorePackage.getInstalledPackages();
 
+                /**
+                 * Create manifest directory if it doesn't exist
+                 */
                 const directoryExists = await fs.existsSync(manifestDirectory);
                 if (!directoryExists) {
                     fs.mkdirSync(manifestDirectory);
                 }
 
+                /**
+                 * Create dependency array
+                 */
                 for (const packageName in installedPackages) {
                     const PackageInfo = require('../thunderstore/PackageInfo');
                     const packageInfo = new PackageInfo(packageName);
@@ -169,6 +175,9 @@ class ThunderstorePackageHandler {
                     }
                 }
 
+                /**
+                 * Update the version number
+                 */
                 let [major, minor, patch] = manifest.version_number.split(".");
                 if (hasPatchChanges) {
                     console.log(`[${path.basename(__filename)}] :: Manifest has patch changes, updating version number...`);
@@ -179,10 +188,19 @@ class ThunderstorePackageHandler {
                     minor = parseInt(minor) + 1;
                     patch = 0;
                 }
+                if (!hasPatchChanges && !hasMinorChanges) {
+                    console.log(`[${path.basename(__filename)}] :: Manifest has no changes, skipping version number update...`);
+                }
 
+                /**
+                 * Update the manifest
+                 */
                 manifest.version_number = [major, minor, patch].join(".");
                 manifest.dependencies = dependencyArray;
 
+                /**
+                 * Save the manifest
+                 */
                 await fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));
                 const createdUpdatedString = fileExists ? "updated" : "created";
                 console.log(`[${path.basename(__filename)}] :: Manifest ${createdUpdatedString} successfully!`);
