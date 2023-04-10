@@ -3,7 +3,6 @@ import fs from 'fs';
 
 class Utils {
     static async generateAvatar(name, filePath, size = 256) {
-        name = name.replaceAll('_', '+');
         const numberOfSpaces = (name.match(/\+/g) || []).length;
 
         const response = await axios({
@@ -27,6 +26,16 @@ class Utils {
         return new Promise((resolve, reject) => {
             writeStream.on('finish', resolve);
             writeStream.on('error', reject);
+        });
+    }
+
+    static generateReadme(name, description, filePath) {
+        const readme = `# ${name}\n\n${description}`;
+
+        fs.writeFile(filePath, readme, (err) => {
+            if (err) {
+                throw err;
+            }
         });
     }
 }

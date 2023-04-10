@@ -20,13 +20,13 @@ class Modpack {
     }
 
     async init() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             await this.iconExists();
+            await this.readmeExists();
 
             const check = [
                 this.modpackDirectory,
                 path.join(this.modpackDirectory, this.manifestFileName),
-                path.join(this.modpackDirectory, this.readmeFileName),
             ]
 
             this.filesOrDirectoriesExistOrError(check);
@@ -95,8 +95,34 @@ class Modpack {
 
             if (answer.createImage) {
                 const iconPath = path.join(this.modpackDirectory, this.iconFileName);
-                const name = this.manifest.name;
+                const name = this.manifest.name.replaceAll("_", "+");
                 await Utils.generateAvatar(name, iconPath);
+
+                return true;
+            } else {
+                throw new Error(err);
+            }
+        }
+    }
+
+    async readmeExists() {
+        try {
+            this.fileOrDirectoryExistsOrError(path.join(this.modpackDirectory, this.readmeFileName));
+            return true;
+        } catch (err) {
+            const answer = await inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'createReadme',
+                    message: `[${path.basename(__filename)}] :: README does not exist. Create one?`,
+                },
+            ]);
+
+            if (answer.createReadme) {
+                const readmePath = path.join(this.modpackDirectory, this.readmeFileName);
+                const name = this.manifest.name.replaceAll("_", " ");
+                const description = this.manifest.description;
+                await Utils.generateReadme(name, description, readmePath);
 
                 return true;
             } else {
