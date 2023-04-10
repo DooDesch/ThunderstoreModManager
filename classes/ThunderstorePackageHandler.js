@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import ThunderstorePackage from './ThunderstorePackage.js';
 import PackageInfo from '../thunderstore/PackageInfo.js';
+import Package from '../thunderstore/Package.js';
 
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -35,18 +36,14 @@ class ThunderstorePackageHandler {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const PackageInfo = require('../thunderstore/PackageInfo');
             const packageInfo = new PackageInfo(packageName);
-
             if (!packageInfo.details) {
                 resolve();
                 return console.error(`[${path.basename(__filename)}] :: Package ${packageName} not found`)
             }
 
-            const Package = require('../thunderstore/Package');
-            const tsPackage = new Package(packageName, packageInfo.details);
-
             // Download dependencies first
+            const tsPackage = new Package(packageName, packageInfo.details);
             if (tsPackage.dependencies) {
                 for (const dependency in tsPackage.dependencies) {
                     const regexPattern = /^[^-]+-([^-\d]+)-([\d\.]+)$/;

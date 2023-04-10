@@ -1,5 +1,10 @@
-const fs = require('fs');
-const axios = require('axios');
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
 
 class Package {
     constructor(name, packageInfo) {
@@ -70,8 +75,6 @@ class Package {
     }
 
     async packageAlreadyDownloaded() {
-        const path = require('path');
-        const { promisify } = require('util');
         const access = promisify(fs.access);
 
         try {

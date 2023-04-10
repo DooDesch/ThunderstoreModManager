@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import extract from 'extract-zip';
 
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -90,8 +91,8 @@ class ThunderstorePackage {
     async extractPackage(tsPackage) {
         const { fullName, filePath } = tsPackage;
 
-        const resolvedFilePath = require('path').resolve(filePath);
-        const resolvedModInstallPath = require('path').resolve(`${this.modInstallPath}/${fullName}`);
+        const resolvedFilePath = path.resolve(filePath);
+        const resolvedModInstallPath = path.resolve(`${this.modInstallPath}/${fullName}`);
 
         // Check if folder exists, if yes, delete it
         if (fs.existsSync(resolvedModInstallPath)) {
@@ -101,8 +102,6 @@ class ThunderstorePackage {
         console.log(`[${path.basename(__filename)}] :: Extracting ${fullName}...`)
 
         return new Promise(async (resolve, reject) => {
-            const extract = require('extract-zip');
-
             await extract(resolvedFilePath, { dir: resolvedModInstallPath }, (err) => {
                 if (err) {
                     console.error(`[${path.basename(__filename)}] :: Failed to extract ${fullName}!`);
@@ -120,7 +119,7 @@ class ThunderstorePackage {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const resolvedModInstallPath = require('path').resolve(`${this.modInstallPath}/${fullName}`);
+            const resolvedModInstallPath = path.resolve(`${this.modInstallPath}/${fullName}`);
 
             if (!fs.existsSync(resolvedModInstallPath)) {
                 resolve();
