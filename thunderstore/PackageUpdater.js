@@ -58,7 +58,7 @@ class PackageUpdater {
                         await this.writePackagesToFile(packages);
                     })
                     .catch(error => {
-                        console.log(error);
+                        console.error(error);
                     });
             } else {
                 console.log(`[${path.basename(__filename)}] :: Packages are up-to-date!`);
@@ -70,7 +70,7 @@ class PackageUpdater {
                     await this.writePackagesToFile(packages);
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(error);
                 });
         }
         this.done = true;

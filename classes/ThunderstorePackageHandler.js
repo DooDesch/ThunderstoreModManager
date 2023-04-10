@@ -107,24 +107,43 @@ class ThunderstorePackageHandler {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
+            const manifestFileName = process.env.MANIFEST_FILE_NAME || "manifest.json";
+            const manifestDirectory = process.env.MANIFEST_FOLDER || "./manifest";
+
+            let manifest = {
+                "name": process.env.MANIFEST_NAME || "Modpack",
+                "version_number": process.env.MANIFEST_VERSION || "1.0.0",
+                "website_url": process.env.MANIFEST_WEBSITE_URL || "https://github.com/thunderstore-io",
+                "description": process.env.MANIFEST_DESCRIPTION || "Modpack Description",
+                "dependencies": [],
+            }
+
+            let hasPatchChanges = false;
+            let hasMinorChanges = false;
+            const dependencyArray = [];
+
             try {
                 const installedPackages = this.thunderstorePackage.getInstalledPackages();
 
-                const manifestDirectory = process.env.MANIFEST_FOLDER || "./manifest";
                 const directoryExists = await fs.existsSync(manifestDirectory);
                 if (!directoryExists) {
                     fs.mkdirSync(manifestDirectory);
                 }
 
-                const manifestFileName = process.env.MANIFEST_FILE_NAME || "manifest.json";
-                let manifest = {
-                    "name": process.env.MANIFEST_NAME || "Modpack",
-                    "version_number": process.env.MANIFEST_VERSION || "1.0.0",
-                    "website_url": process.env.MANIFEST_WEBSITE_URL || "https://github.com/thunderstore-io",
-                    "description": process.env.MANIFEST_DESCRIPTION || "Modpack Description",
-                    "dependencies": [],
+                for (const packageName in installedPackages) {
+                    const PackageInfo = require('../thunderstore/PackageInfo');
+                    const packageInfo = new PackageInfo(packageName);
+
+                    const name = packageInfo.details.fullName;
+                    const version = installedPackages[packageName];
+                    dependencyArray.push(`${name}-${version}`);
                 }
 
+                /**
+                 * Check if manifest already exists
+                 * If it does, compare the dependencies
+                 * If there are any changes, tell to update the minor version
+                 */
                 const filePath = path.join(process.env.MANIFEST_FOLDER, manifestFileName);
                 const fileExists = await fs.existsSync(filePath);
                 if (fileExists) {
@@ -132,18 +151,36 @@ class ThunderstorePackageHandler {
 
                     const manifestFileContent = await fs.readFileSync(filePath, 'utf-8');
                     manifest = JSON.parse(manifestFileContent);
+
+                    const additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
+                    const removals = manifest.dependencies.filter(x => !dependencyArray.includes(x));
+
+                    if (additions.length > 0) {
+                        console.log(`[${path.basename(__filename)}] :: Added dependencies: ${additions.join(", ")}`);
+                        hasPatchChanges = true;
+                    }
+                    if (removals.length > 0) {
+                        console.log(`[${path.basename(__filename)}] :: Removed dependencies: ${removals.join(", ")}`);
+                        hasPatchChanges = true;
+                    }
+
+                    if (manifest.dependencies.length !== dependencyArray.length) {
+                        hasMinorChanges = true;
+                    }
                 }
 
-                const dependencyArray = [];
-                for (const packageName in installedPackages) {
-                    const PackageInfo = require('../thunderstore/PackageInfo');
-                    const packageInfo = new PackageInfo(packageName);
-
-                    const name = packageInfo.details.fullName;
-                    const version = packageInfo.details.versionNumber;
-                    dependencyArray.push(`${name}-${version}}`);
+                let [major, minor, patch] = manifest.version_number.split(".");
+                if (hasPatchChanges) {
+                    console.log(`[${path.basename(__filename)}] :: Manifest has patch changes, updating version number...`);
+                    patch = parseInt(patch) + 1;
+                }
+                if (hasMinorChanges) {
+                    console.log(`[${path.basename(__filename)}] :: Manifest has minor changes, updating version number...`);
+                    minor = parseInt(minor) + 1;
+                    patch = 0;
                 }
 
+                manifest.version_number = [major, minor, patch].join(".");
                 manifest.dependencies = dependencyArray;
 
                 await fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));

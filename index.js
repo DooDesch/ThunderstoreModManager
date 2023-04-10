@@ -5,6 +5,15 @@ require('dotenv').config();
 const PackageUpdater = require('./thunderstore/PackageUpdater');
 const packageUpdater = new PackageUpdater(); // Update thunderstorePackage.json
 
+const createManifest = async () => {
+    await packageUpdater.isDone();
+
+    const ThunderstorePackageHandler = require('./classes/ThunderstorePackageHandler');
+    const thunderstorePackageHandler = new ThunderstorePackageHandler();
+
+    await thunderstorePackageHandler.createManifest();
+}
+
 program.version('1.0.0');
 
 program
@@ -64,12 +73,3 @@ program
     });
 
 program.parse(process.argv);
-
-const createManifest = async () => {
-    await packageUpdater.isDone();
-
-    const ThunderstorePackageHandler = require('./classes/ThunderstorePackageHandler');
-    const thunderstorePackageHandler = new ThunderstorePackageHandler();
-
-    await thunderstorePackageHandler.createManifest();
-}
