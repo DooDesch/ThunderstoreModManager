@@ -11,15 +11,15 @@ program.version('1.0.0');
 program
     .command('install [package] [download]')
     .description('Install a package by name')
-    .action(async (packageName, download) => {
-        await action.installPackageByName(packageName, download !== 'false');
+    .action(async (packageName, download = 'true') => {
+        await action.installPackageByName(packageName, download === 'true');
     });
 
 program
     .command('update [package] [download]')
     .description('Update all installed packages or a specific package')
-    .action(async (packageName, download) => {
-        await action.updatePackageByName(packageName, download !== 'false');
+    .action(async (packageName, download = 'true') => {
+        await action.updatePackageByName(packageName, download === 'true');
     });
 
 program
