@@ -15,7 +15,7 @@ class Package {
         this.dependencies = dependencies;
         this.downloadUrl = downloadUrl;
 
-        this.directory = `./zipped-packages`;
+        this.directory = `./cache/downloads`;
         this.fileName = `${this.fullName}-${this.version}.zip`;
         this.filePath = `${this.directory}/${this.fileName}`;
 

@@ -6,5 +6,6 @@ zipped-packages
 config
 modpack
 dist
+cache
 *.zip
 *.dll

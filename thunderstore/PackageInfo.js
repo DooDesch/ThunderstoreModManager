@@ -9,7 +9,7 @@ class PackageInfo {
     getPackageInfoFromCurrentPackages(packageName) {
         try {
             // Load "currentPackages.json" into a variable called currentPackages
-            const currentPackagesFile = fs.readFileSync('./currentPackages.json', 'utf8');
+            const currentPackagesFile = fs.readFileSync('./cache/currentPackages.json', 'utf8');
             const currentPackages = JSON.parse(currentPackagesFile);
 
             // Find the package with the given name

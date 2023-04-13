@@ -9,6 +9,11 @@ class ThunderstorePackage {
     isInitialized = false;
     fileName = 'thunderstorePackage.json';
 
+    constructor() {
+        this.json = {};
+        this.modInstallPath = "";
+    }
+
     async init() {
         return new Promise(async (resolve) => {
             const packageJsonExists = await this.checkIfPackageJsonExists();
@@ -31,7 +36,7 @@ class ThunderstorePackage {
     createPackageJson() {
         fs.writeFileSync(this.fileName, JSON.stringify({
             "modInstallPath": process.env.MOD_INSTALL_PATH || "./config/plugins",
-            "packageInfoPath": "./currentPackages.json",
+            "packageInfoPath": "./cache/currentPackages.json",
             "dependencies": {},
         }, null, 4));
     }

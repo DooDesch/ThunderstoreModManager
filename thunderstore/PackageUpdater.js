@@ -1,13 +1,14 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import Utils from '../classes/Utils.js';
 
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 class PackageUpdater {
     game = process.env.GAME.toLowerCase();
-    packageInfoPath = 'currentPackages.json'
+    packageInfoPath = 'cache/currentPackages.json'
     done = false;
 
     constructor() {
@@ -49,6 +50,8 @@ class PackageUpdater {
     }
 
     async updatePackages() {
+        await Utils.generateFolderStructure(path.resolve('cache'));
+
         if (fs.existsSync(this.packageInfoPath)) {
             const fileStats = fs.statSync(this.packageInfoPath);
             const currentTime = new Date().getTime();

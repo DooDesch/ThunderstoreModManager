@@ -38,6 +38,15 @@ class Utils {
             }
         });
     }
+
+    static generateFolderStructure(folderPath) {
+        return new Promise((resolve) => {
+            if (fs.existsSync(folderPath)) return resolve();
+
+            fs.mkdirSync(folderPath);
+            resolve();
+        });
+    }
 }
 
 export default Utils;
