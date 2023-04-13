@@ -3,6 +3,7 @@ import path from 'path';
 import ThunderstorePackage from './ThunderstorePackage.js';
 import PackageInfo from '../thunderstore/PackageInfo.js';
 import Package from '../thunderstore/Package.js';
+import Changelog from './Changelog.js';
 import inquirer from 'inquirer';
 
 import { fileURLToPath } from 'url';
@@ -186,9 +187,11 @@ class ThunderstorePackageHandler {
                 /** 
                  * Check if there are any changes
                  */
+                let additions = [];
+                let removals = [];
                 if (fileExists) {
-                    const additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
-                    const removals = manifest.dependencies.filter(x => !dependencyArray.includes(x));
+                    additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
+                    removals = manifest.dependencies.filter(x => !dependencyArray.includes(x));
 
                     if (additions.length > 0) {
                         console.log(`[${path.basename(__filename)}] :: Added dependencies: ${additions.join(", ")}`);
@@ -233,6 +236,13 @@ class ThunderstorePackageHandler {
                 fs.writeFileSync(filePath, JSON.stringify(manifest, null, 4));
                 const createdUpdatedString = fileExists ? "updated" : "created";
                 console.log(`[${path.basename(__filename)}] :: Manifest ${createdUpdatedString} successfully!`);
+
+                /**
+                 * Update the changelog
+                 */
+                const changelog = new Changelog();
+                await changelog.updateChangelog(manifest.version_number, additions, removals);
+
                 resolve();
             } catch (err) {
                 reject(err);
