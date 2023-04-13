@@ -11,15 +11,21 @@ program.version('1.0.0');
 program
     .command('install [package]')
     .description('Install a package by name')
+    .option('-n, --no-download', 'Do not download the package')
     .action(async (packageName) => {
-        await action.installPackageByName(packageName);
+        const options = program.opts();
+
+        await action.installPackageByName(packageName, options.noDownload || false);
     });
 
 program
     .command('update [package]')
+    .option('-n, --no-download', 'Do not download the package')
     .description('Update all installed packages or a specific package')
     .action(async (packageName) => {
-        await action.updatePackageByName(packageName);
+        const options = program.opts();
+
+        await action.updatePackageByName(packageName, options.noDownload || false);
     });
 
 program
@@ -44,8 +50,8 @@ program
     });
 
 program
-    .command('create:modpack [updateManifest]')
-    .description('Create a modpack using the dependencies in your thunderstorePackage.json')
+    .command('create:modpack:zip [updateManifest]')
+    .description('Zip your modpack using the dependencies in your thunderstorePackage.json')
     .action(async (updateManifest = 'true') => {
         await action.createModpack(updateManifest === 'true');
     });

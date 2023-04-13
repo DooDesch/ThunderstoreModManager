@@ -31,7 +31,7 @@ class ThunderstorePackageHandler {
         });
     }
 
-    installPackageByName(packageName) {
+    installPackageByName(packageName, noDownload = false) {
         if (this.installedPackages.includes(packageName)) return;
 
         return new Promise(async (resolve, reject) => {
@@ -58,6 +58,13 @@ class ThunderstorePackageHandler {
                 }
             }
 
+            if (noDownload) {
+                await this.thunderstorePackage.saveInstalledPackages(packageName, tsPackage.version);
+                this.installedPackages.push(packageName);
+                resolve();
+                return;
+            }
+
             await tsPackage.downloadPackage()
                 .then(async () => {
                     await this.thunderstorePackage.extractPackage(tsPackage);
@@ -72,7 +79,7 @@ class ThunderstorePackageHandler {
         });
     }
 
-    updateInstalledPackages() {
+    updateInstalledPackages(noDownload = false) {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
@@ -80,7 +87,7 @@ class ThunderstorePackageHandler {
 
             try {
                 for (const packageName in installedPackages) {
-                    await this.installPackageByName(packageName);
+                    await this.installPackageByName(packageName, noDownload);
                 }
                 resolve();
             } catch (err) {
