@@ -12,12 +12,12 @@ class Action {
         return await this.packageUpdater.isDone();
     }
 
-    installPackageByName(packageName) {
+    installPackageByName(packageName, download = true) {
         return new Promise(async (resolve, reject) => {
             try {
                 await this.init();
 
-                await this.installOrUpdatePackageByName(packageName);
+                await this.installOrUpdatePackageByName(packageName, download);
 
                 const installedPackages = this.thunderstorePackageHandler.thunderstorePackage.getInstalledPackages();
                 const totalInstalledMods = Object.keys(installedPackages).length
@@ -32,22 +32,22 @@ class Action {
         });
     }
 
-    updatePackageByName(packageName) {
+    updatePackageByName(packageName, download = true) {
         return new Promise(async (resolve) => {
             await this.init();
 
-            await this.installOrUpdatePackageByName(packageName);
+            await this.installOrUpdatePackageByName(packageName, download);
 
             resolve();
         });
     }
 
-    installOrUpdatePackageByName(packageName) {
+    installOrUpdatePackageByName(packageName, download = true) {
         return new Promise(async (resolve) => {
             await this.init();
 
-            if (packageName) await this.thunderstorePackageHandler.installPackageByName(packageName);
-            else await this.thunderstorePackageHandler.updateInstalledPackages();
+            if (packageName) await this.thunderstorePackageHandler.installPackageByName(packageName, download);
+            else await this.thunderstorePackageHandler.updateInstalledPackages(download);
 
             resolve();
         });

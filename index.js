@@ -9,23 +9,17 @@ const action = new Action();
 program.version('1.0.0');
 
 program
-    .command('install [package]')
+    .command('install [package] [download]')
     .description('Install a package by name')
-    .option('-n, --no-download', 'Do not download the package')
-    .action(async (packageName) => {
-        const options = program.opts();
-
-        await action.installPackageByName(packageName, options.noDownload || false);
+    .action(async (packageName, download) => {
+        await action.installPackageByName(packageName, download !== 'false');
     });
 
 program
-    .command('update [package]')
-    .option('-n, --no-download', 'Do not download the package')
+    .command('update [package] [download]')
     .description('Update all installed packages or a specific package')
-    .action(async (packageName) => {
-        const options = program.opts();
-
-        await action.updatePackageByName(packageName, options.noDownload || false);
+    .action(async (packageName, download) => {
+        await action.updatePackageByName(packageName, download !== 'false');
     });
 
 program
