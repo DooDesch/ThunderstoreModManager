@@ -77,8 +77,9 @@ class Action {
         return new Promise(async (resolve) => {
             await this.init();
 
+            const modpack = new Modpack();
             if (updateManifest) await this.createManifest();
-            await new Modpack.createModpack();
+            await modpack.createModpack();
 
             resolve();
         });
