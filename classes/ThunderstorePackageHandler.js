@@ -149,17 +149,6 @@ class ThunderstorePackageHandler {
                 }
 
                 /**
-                 * Create dependency array
-                 */
-                for (const packageName in installedPackages) {
-                    const packageInfo = new PackageInfo(packageName);
-
-                    const name = packageInfo.details.fullName;
-                    const version = installedPackages[packageName];
-                    dependencyArray.push(`${name}-${version}`);
-                }
-
-                /**
                  * Check if manifest already exists
                  * If it does, compare the dependencies
                  * If there are any changes, tell to update the minor version
@@ -171,7 +160,33 @@ class ThunderstorePackageHandler {
 
                     const manifestFileContent = fs.readFileSync(filePath, 'utf-8');
                     manifest = JSON.parse(manifestFileContent);
+                } else {
+                    manifest = {
+                        "name": process.env.MANIFEST_NAME || await this.askForManifestDetail("Modpack Name", "Modpack"),
+                        "version_number": process.env.MANIFEST_VERSION || await this.askForManifestDetail("Modpack Version", "1.0.0"),
+                        "website_url": process.env.MANIFEST_WEBSITE_URL || await this.askForManifestDetail("Modpack Website URL", "https://github.com/thunderstore-io"),
+                        "description": process.env.MANIFEST_DESCRIPTION || await this.askForManifestDetail("Modpack Description", "A modpack made with Thunderstore.io"),
+                        "dependencies": [],
+                    }
+                }
 
+                /**
+                 * Create dependency array
+                 */
+                for (const packageName in installedPackages) {
+                    if (packageName === manifest.name) continue;
+
+                    const packageInfo = new PackageInfo(packageName);
+
+                    const name = packageInfo.details.fullName;
+                    const version = installedPackages[packageName];
+                    dependencyArray.push(`${name}-${version}`);
+                }
+
+                /** 
+                 * Check if there are any changes
+                 */
+                if (fileExists) {
                     const additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
                     const removals = manifest.dependencies.filter(x => !dependencyArray.includes(x));
 
@@ -186,14 +201,6 @@ class ThunderstorePackageHandler {
 
                     if (manifest.dependencies.length !== dependencyArray.length) {
                         hasMinorChanges = true;
-                    }
-                } else {
-                    manifest = {
-                        "name": process.env.MANIFEST_NAME || await this.askForManifestDetail("Modpack Name", "Modpack"),
-                        "version_number": process.env.MANIFEST_VERSION || await this.askForManifestDetail("Modpack Version", "1.0.0"),
-                        "website_url": process.env.MANIFEST_WEBSITE_URL || await this.askForManifestDetail("Modpack Website URL", "https://github.com/thunderstore-io"),
-                        "description": process.env.MANIFEST_DESCRIPTION || await this.askForManifestDetail("Modpack Description", "A modpack made with Thunderstore.io"),
-                        "dependencies": [],
                     }
                 }
 
