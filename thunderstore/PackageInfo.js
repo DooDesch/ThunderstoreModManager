@@ -1,20 +1,17 @@
 import fs from 'fs';
 
 class PackageInfo {
-    constructor(packageName, version) {
-        this.packageName = packageName;
+    constructor({ name, version }, currentPackages) {
+        this.name = name;
         this.version = version;
-        this.details = this.getPackageInfoFromCurrentPackages(packageName);
+        this.currentPackages = currentPackages;
+        this.details = this.getPackageInfoFromCurrentPackages(name);
     }
 
-    getPackageInfoFromCurrentPackages(packageName) {
+    getPackageInfoFromCurrentPackages(name) {
         try {
-            // Load "currentPackages.json" into a variable called currentPackages
-            const currentPackagesFile = fs.readFileSync('./cache/currentPackages.json', 'utf8');
-            const currentPackages = JSON.parse(currentPackagesFile);
-
             // Find the package with the given name
-            const thunderstorePackage = currentPackages.find(pkg => pkg.name === packageName);
+            const thunderstorePackage = this.currentPackages.find(pkg => pkg.name === name);
 
             // Return null if the package is not found
             if (!thunderstorePackage) {

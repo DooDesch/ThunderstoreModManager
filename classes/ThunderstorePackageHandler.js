@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import ThunderstorePackage from './ThunderstorePackage.js';
+import CurrentPackages from '../thunderstore/CurrentPackages.js';
 import PackageInfo from '../thunderstore/PackageInfo.js';
 import Package from '../thunderstore/Package.js';
 import Changelog from './Changelog.js';
@@ -26,6 +27,9 @@ class ThunderstorePackageHandler {
                 return;
             }
 
+            const currentPackages = new CurrentPackages();
+            this.currentPackages = await currentPackages.getPackages();
+
             await this.thunderstorePackage.init();
             this.isInitialized = true;
 
@@ -40,7 +44,7 @@ class ThunderstorePackageHandler {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const packageInfo = new PackageInfo(name, version);
+            const packageInfo = new PackageInfo({ name, version }, this.currentPackages);
             if (!packageInfo.details) {
                 resolve();
                 const versionString = version ? `@${version}` : '';
@@ -110,12 +114,12 @@ class ThunderstorePackageHandler {
         });
     }
 
-    removePackageByName(packageName) {
+    removePackageByName(name) {
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const packageInfo = new PackageInfo(packageName);
-            await this.thunderstorePackage.removeInstalledPackage(packageName, packageInfo.details.fullName);
+            const packageInfo = new PackageInfo({ name }, this.currentPackages);
+            await this.thunderstorePackage.removeInstalledPackage(name, packageInfo.details.fullName);
 
             resolve();
         });
@@ -209,7 +213,7 @@ class ThunderstorePackageHandler {
                 for (const packageName in installedPackages) {
                     if (packageName === manifest.name) continue;
 
-                    const packageInfo = new PackageInfo(packageName);
+                    const packageInfo = new PackageInfo({ name: packageName }, this.currentPackages);
 
                     const name = packageInfo.details.fullName;
                     const version = installedPackages[packageName];
