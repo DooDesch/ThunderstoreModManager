@@ -1,11 +1,11 @@
-thunderstorepackage.json
-currentPackages.json
-.env
 node_modules
 zipped-packages
 config
-modpack/*
 dist
 cache
+modpack/*
+.env
+thunderstorepackage.json
+currentPackages.json
 *.zip
 *.dll
