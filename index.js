@@ -1,6 +1,10 @@
 import { program } from 'commander';
 import dotenv from 'dotenv';
 import Action from './classes/Action.js';
+import Utils from './classes/Utils.js';
+
+// Check if .env file exists
+await Utils.checkSetup();
 
 dotenv.config();
 

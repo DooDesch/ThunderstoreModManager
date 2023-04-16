@@ -1,7 +1,60 @@
 import axios from 'axios';
 import fs from 'fs';
+import inquirer from 'inquirer';
 
 class Utils {
+    static async checkSetup() {
+        // Check if .env file exists
+        if (!fs.existsSync('.env')) {
+            // Ask user to create .env file
+            const { createEnv } = await inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'createEnv',
+                    message: 'No .env file found. Do you want to create one?',
+                },
+            ]);
+
+            if (createEnv) {
+                // Create .env-example file
+                const envExample = fs.readFileSync('.env-example', 'utf8');
+                const envExampleJson = envExample.split('\n').reduce((acc, line) => {
+                    // Skip empty and commented lines
+                    if (!line.includes('=')) return acc;
+
+                    const [key, value] = line.split('=');
+                    acc[key] = value;
+                    return acc;
+                }, {});
+
+                // Ask user for values
+                const envValues = await inquirer.prompt(
+                    Object.keys(envExampleJson).map((key) => {
+                        return {
+                            type: 'input',
+                            name: key,
+                            message: `Enter value for ${key}`,
+                            default: envExampleJson[key],
+                        };
+                    })
+                );
+
+                // Create .env file
+                const envFile = Object.keys(envValues).reduce((acc, key) => {
+                    acc += `${key}=${envValues[key]}\n`;
+                    return acc;
+                }, '');
+
+                fs.writeFileSync('.env', envFile);
+            }
+
+            // Check if .env file exists again
+            if (!fs.existsSync('.env')) {
+                throw new Error('No .env file found. Please create one.');
+            }
+        }
+    }
+
     static async generateAvatar(name, filePath, size = 256) {
         const numberOfSpaces = (name.match(/\+/g) || []).length;
 
