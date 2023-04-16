@@ -104,13 +104,20 @@ class Action {
     }
 
     start() {
-        return new Promise(async (resolve) => {
+        this.packageUpdater = new PackageUpdater();
+        this.thunderstorePackageHandler = new ThunderstorePackageHandler();
+
+        return new Promise(async () => {
             const questions = [
                 {
                     type: 'list',
                     name: 'action',
                     message: 'What do you want to do?',
                     choices: [
+                        {
+                            name: 'Install packages from thunderstorePackage.json file',
+                            value: 'installAllPackages',
+                        },
                         {
                             name: 'Install a package',
                             value: 'installPackageByName',
@@ -164,7 +171,7 @@ class Action {
                     name: 'download',
                     message: 'Do you want to download the package/s?',
                     default: true,
-                    when: (answers) => ['installPackageByName', 'updatePackageByName', 'updatePackages'].includes(answers.action), // only ask this question if the "install" option is selected
+                    when: (answers) => ['installPackageByName', 'installAllPackages', 'updatePackageByName', 'updatePackages'].includes(answers.action), // only ask this question if the "install" option is selected
                 },
                 {
                     type: 'confirm',
@@ -182,6 +189,7 @@ class Action {
             }
 
             switch (actionName) {
+                case 'installAllPackages':
                 case 'installPackageByName':
                     await this.installPackageByName(packageName, download);
                     break;
@@ -201,8 +209,7 @@ class Action {
             }
 
             // Ask again
-            await this.start();
-            resolve();
+            return await this.start();
         });
     }
 }
