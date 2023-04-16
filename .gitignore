@@ -4,7 +4,7 @@ currentPackages.json
 node_modules
 zipped-packages
 config
-modpack
+modpack/*
 dist
 cache
 *.zip
