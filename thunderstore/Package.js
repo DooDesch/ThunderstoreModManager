@@ -8,10 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 
 class Package {
     constructor(name, packageInfo) {
-        const { latest, dependencies, downloadUrl, fullName } = packageInfo;
+        const { versionNumber, dependencies, downloadUrl, fullName } = packageInfo;
         this.name = name;
         this.fullName = fullName;
-        this.version = latest;
+        this.version = versionNumber;
         this.dependencies = dependencies;
         this.downloadUrl = downloadUrl;
 

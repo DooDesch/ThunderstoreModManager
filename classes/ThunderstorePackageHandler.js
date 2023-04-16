@@ -32,37 +32,43 @@ class ThunderstorePackageHandler {
         });
     }
 
-    installPackageByName(packageName, download = true) {
-        if (this.installedPackages.includes(packageName)) return;
+    installPackageByName({ name, version }, download = true) {
+        if (this.installedPackages.includes(name)) return;
 
         return new Promise(async (resolve, reject) => {
             await this.init();
 
-            const packageInfo = new PackageInfo(packageName);
+            const packageInfo = new PackageInfo(name, version);
             if (!packageInfo.details) {
                 resolve();
-                return console.error(`[${path.basename(__filename)}] :: Package ${packageName} not found`)
+                const versionString = version ? `@${version}` : '';
+                return console.error(`[${path.basename(__filename)}] :: Package ${name}${versionString} not found`)
             }
 
             // Download dependencies first
-            const tsPackage = new Package(packageName, packageInfo.details);
+            const tsPackage = new Package(name, packageInfo.details);
             if (tsPackage.dependencies) {
                 for (const dependency in tsPackage.dependencies) {
                     const regexPattern = /^[^-]+-([^-\d]+)-([\d\.]+)$/;
 
                     const match = tsPackage.dependencies[dependency].match(regexPattern);
                     if (match) {
-                        await this.installPackageByName(match[1], download);
+                        const packageData = {
+                            name: match[1],
+                            version: match[2]
+                        }
+
+                        await this.installPackageByName(packageData, download);
                     } else {
-                        console.error(`[${path.basename(__filename)}] :: Failed to install dependency ${tsPackage.dependencies[dependency]} for ${packageName}`);
+                        console.error(`[${path.basename(__filename)}] :: Failed to install dependency ${tsPackage.dependencies[dependency]} for ${name}`);
                     }
                 }
             }
 
             if (!download) {
-                console.log(`[${path.basename(__filename)}] :: Skipping download for ${packageName}...`);
-                await this.thunderstorePackage.saveInstalledPackages(packageName, tsPackage.version);
-                this.installedPackages.push(packageName);
+                console.log(`[${path.basename(__filename)}] :: Skipping download for ${name}...`);
+                await this.thunderstorePackage.saveInstalledPackages(name, tsPackage.version);
+                this.installedPackages.push(name);
                 resolve();
                 return;
             }
@@ -70,12 +76,12 @@ class ThunderstorePackageHandler {
             await tsPackage.downloadPackage()
                 .then(async () => {
                     await this.thunderstorePackage.extractPackage(tsPackage);
-                    await this.thunderstorePackage.saveInstalledPackages(packageName, tsPackage.version);
-                    this.installedPackages.push(packageName);
+                    await this.thunderstorePackage.saveInstalledPackages(name, tsPackage.version);
+                    this.installedPackages.push(name);
                     resolve();
                 })
                 .catch((err) => {
-                    console.error(`[${path.basename(__filename)}] :: Failed to install ${packageName}: ${err}`);
+                    console.error(`[${path.basename(__filename)}] :: Failed to install ${name}: ${err}`);
                     reject(err);
                 });
         });
@@ -89,7 +95,11 @@ class ThunderstorePackageHandler {
 
             try {
                 for (const packageName in installedPackages) {
-                    await this.installPackageByName(packageName, download);
+                    const packageData = {
+                        name: packageName,
+                        version: null
+                    }
+                    await this.installPackageByName(packageData, download);
                 }
                 resolve();
             } catch (err) {

@@ -1,8 +1,9 @@
 import fs from 'fs';
 
 class PackageInfo {
-    constructor(packageName) {
+    constructor(packageName, version) {
         this.packageName = packageName;
+        this.version = version;
         this.details = this.getPackageInfoFromCurrentPackages(packageName);
     }
 
@@ -22,10 +23,20 @@ class PackageInfo {
 
             // Get the latest version of the package
             const latestVersion = thunderstorePackage.versions[0];
+            let version = latestVersion;
+
+            // Overwrite version with the requested version if it exists
+            if (this.version) {
+                const requestedVersion = thunderstorePackage.versions.find(version => version.version_number === this.version);
+
+                if (requestedVersion) {
+                    version = requestedVersion;
+                }
+            }
 
             // Get the download URL and dependencies for the latest version
-            const downloadUrl = latestVersion.download_url;
-            const dependencies = latestVersion.dependencies;
+            const downloadUrl = version.download_url;
+            const dependencies = version.dependencies;
 
             // Create an object containing all the package information
             const packageInfo = {
@@ -41,20 +52,20 @@ class PackageInfo {
                 isDeprecated: thunderstorePackage.is_deprecated,
                 hasNsfwContent: thunderstorePackage.has_nsfw_content,
                 categories: thunderstorePackage.categories,
-                versionNumber: latestVersion.version_number,
-                description: latestVersion.description,
-                icon: latestVersion.icon,
+                versionNumber: version.version_number,
+                description: version.description,
+                icon: version.icon,
                 downloadUrl: downloadUrl,
                 dependencies: dependencies,
-                downloads: latestVersion.downloads,
-                websiteUrl: latestVersion.website_url,
-                isActive: latestVersion.is_active,
-                fileSize: latestVersion.file_size,
+                downloads: version.downloads,
+                websiteUrl: version.website_url,
+                isActive: version.is_active,
+                fileSize: version.file_size,
                 latest: latestVersion.version_number,
             };
 
             // Add the latest version information to the package object
-            packageInfo.versions = [latestVersion];
+            packageInfo.versions = [latestVersion, version];
 
             // Return the package information
             return packageInfo;
