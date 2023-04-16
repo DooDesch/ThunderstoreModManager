@@ -88,6 +88,8 @@ class ThunderstorePackage {
 
                 const text = isUpdating ? 'updated' : 'installed';
                 console.log(`[${path.basename(__filename)}] :: Successfully ${text} ${name} with version ${version}!`)
+                console.log('-------------------------')
+
                 resolve();
             });
         });
@@ -104,7 +106,7 @@ class ThunderstorePackage {
             fs.rmSync(resolvedModInstallPath, { recursive: true });
         }
 
-        console.log(`[${path.basename(__filename)}] :: Extracting ${fullName}...`)
+        process.stdout.write(`[${path.basename(__filename)}] :: Extracting ${fullName}...\r`)
 
         return new Promise(async (resolve, reject) => {
             await extract(resolvedFilePath, { dir: resolvedModInstallPath }, (err) => {
@@ -115,7 +117,6 @@ class ThunderstorePackage {
                 }
             });
 
-            console.log(`[${path.basename(__filename)}] :: Successfully extracted ${fullName}!`);
             resolve();
         });
     }

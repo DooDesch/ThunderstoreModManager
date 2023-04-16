@@ -85,10 +85,10 @@ class Package {
                 throw new Error('File is empty');
             }
 
-            console.log(`[${path.basename(__filename)}] :: ${this.fullName} is already up-to-date...`);
+            process.stdout.write(`[${path.basename(__filename)}] :: ${this.fullName} is already up-to-date...\r`);
             return true;
         } catch (error) {
-            console.log(`[${path.basename(__filename)}] :: Downloading ${this.fullName} now...`);
+            process.stdout.write(`[${path.basename(__filename)}] :: Downloading ${this.fullName} now...\r`);
             return false;
         }
     }

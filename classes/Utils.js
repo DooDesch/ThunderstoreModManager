@@ -100,6 +100,8 @@ class Utils {
             resolve();
         });
     }
+
+    static sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default Utils;

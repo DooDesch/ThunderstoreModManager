@@ -43,7 +43,7 @@ class PackageUpdater {
                     reject(err);
                     return;
                 };
-                console.log(`[${path.basename(__filename)}] :: Successfully updated packages!`);
+
                 resolve();
             });
         });
@@ -66,8 +66,6 @@ class PackageUpdater {
                     .catch(error => {
                         console.error(error);
                     });
-            } else {
-                console.log(`[${path.basename(__filename)}] :: Packages are up-to-date!`);
             }
         } else {
             console.log(`[${path.basename(__filename)}] :: File does not exist. Creating file and updating packages...`);
@@ -79,6 +77,7 @@ class PackageUpdater {
                     console.error(error);
                 });
         }
+
         this.done = true;
     }
 

@@ -7,7 +7,6 @@ import Utils from './classes/Utils.js';
 await Utils.checkSetup();
 
 dotenv.config();
-
 const action = new Action();
 
 program.version('1.0.0');
