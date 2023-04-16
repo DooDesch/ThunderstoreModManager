@@ -33,7 +33,7 @@ git clone https://github.com/DooDesch/ThunderstoreNodejsModManager.git
 npm install
 ```
 
-3. Create a .env file based on the .env-example file, and modify the values as needed.
+3. Create a `.env` file based on the `.env-example` file, and modify the values as needed.
 
 ## Usage
 
