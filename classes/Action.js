@@ -46,6 +46,17 @@ class Action {
         return new Promise(async (resolve) => {
             await this.init();
 
+            if (packageName === 'false') {
+                packageName = null;
+                download = false;
+            }
+
+            if (!packageName) {
+                await this.thunderstorePackageHandler.updateInstalledPackages(download)
+                resolve();
+                return;
+            };
+
             //Check if packagnename includes a version
             const splittedPackagaName = packageName.split('@');
             const packageData = {
@@ -53,9 +64,7 @@ class Action {
                 version: splittedPackagaName[1] || null
             }
 
-
-            if (packageData.name) await this.thunderstorePackageHandler.installPackageByName(packageData, download);
-            else await this.thunderstorePackageHandler.updateInstalledPackages(download);
+            await this.thunderstorePackageHandler.installPackageByName(packageData, download);
 
             resolve();
         });
