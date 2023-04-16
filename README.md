@@ -17,6 +17,7 @@ Thunderstore Nodejs Mod Manager is a command-line tool that makes it easy to dow
 - Update installed mods to the latest version
 - Remove installed mods
 - Create and manage modpacks
+- Start the mod manager with a menu-driven interface
 
 ## Installation
 
@@ -56,6 +57,9 @@ Here are some examples of how to use the tool:
 - Create a manifest file: `node index create:manifest`
 - Update the modpack: `node index update:modpack`
 - Create a modpack: `node index create:modpack:zip [updateManifest = true]`
+- Start the mod manager with interactive prompts: `node index start`
+
+When you start the mod manager with the start command, you will be prompted with a list of questions to guide you through the process of installing, updating, or removing mods, creating a manifest file, or creating a modpack.
 
 ## Configuration
 
