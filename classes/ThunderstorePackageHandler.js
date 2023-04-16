@@ -5,6 +5,8 @@ import PackageInfo from '../thunderstore/PackageInfo.js';
 import Package from '../thunderstore/Package.js';
 import Changelog from './Changelog.js';
 import inquirer from 'inquirer';
+import AdmZip from 'adm-zip';
+import crypto from 'crypto';
 
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -177,7 +179,23 @@ class ThunderstorePackageHandler {
                         "version_number": process.env.MANIFEST_VERSION || await this.askForManifestDetail("Modpack Version", "1.0.0"),
                         "website_url": process.env.MANIFEST_WEBSITE_URL || await this.askForManifestDetail("Modpack Website URL", "https://github.com/thunderstore-io"),
                         "description": process.env.MANIFEST_DESCRIPTION || await this.askForManifestDetail("Modpack Description", "A modpack made with Thunderstore.io"),
+                        "config_folder_hash": null,
                         "dependencies": [],
+                    }
+                }
+
+                /** 
+                 * Get config folder md5 hash
+                 */
+                const configFolder = path.join(process.env.MODPACK_FOLDER, "config");
+                const configFolderExists = fs.existsSync(configFolder);
+                if (configFolderExists) {
+                    const configFolderHash = await this.getFolderHash(configFolder);
+                    const currentConfigFolderHash = manifest.config_folder_hash || null;
+                    if (manifest.config_folder_hash !== configFolderHash) {
+                        console.log(`[${path.basename(__filename)}] :: Config folder hash changed, updating manifest...`);
+                        manifest.config_folder_hash = configFolderHash;
+                        if (currentConfigFolderHash) hasPatchChanges = true;
                     }
                 }
 
@@ -259,6 +277,38 @@ class ThunderstorePackageHandler {
             }
         });
     }
+
+    getFolderHash(folderPath) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Zip files, get hash, remove zip
+                const zip = new AdmZip();
+                zip.addLocalFolder(folderPath);
+                const zipPath = path.join(folderPath, "temp.zip");
+                zip.writeZip(zipPath);
+                const folderHash = await this.getFileHash(zipPath);
+                fs.unlinkSync(zipPath);
+
+                resolve(folderHash);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    getFileHash(filePath) {
+        return new Promise((resolve, reject) => {
+            const hash = crypto.createHash('md5');
+            const fileBuffer = fs.readFileSync(filePath);
+            hash.update(fileBuffer);
+
+            const base64Hash = hash.digest('base64');
+            const base64HashNoPadding = base64Hash.replace(/=/g, "");
+
+            resolve(base64HashNoPadding);
+        });
+    }
+
 }
 
 export default ThunderstorePackageHandler;
