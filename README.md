@@ -51,10 +51,10 @@ node index --help
 Here are some examples of how to use the tool:
 
 - Install a mod: `node index install mod-name [download = true]`
-- Update a mod: `node index update mod-name [download = true]`
+- Update all or a specific mod: `node index update [mod-name] [download = true]`
 - Remove a mod: `node index remove mod-name`
 - Create a manifest file: `node index create:manifest`
-- Update the manifest file: `node index update:manifest`
+- Update the modpack: `node index update:modpack`
 - Create a modpack: `node index create:modpack:zip [updateManifest = true]`
 
 ## Configuration

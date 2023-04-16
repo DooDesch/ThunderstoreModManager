@@ -41,8 +41,8 @@ program
     });
 
 program
-    .command('update:manifest')
-    .description('Update the dependencies in your manifest file using the dependencies in your thunderstorePackage.json')
+    .command('update:modpack')
+    .description('Update the dependencies in your modpack using the dependencies in your thunderstorePackage.json')
     .action(async () => {
         await action.createManifest();
     });
