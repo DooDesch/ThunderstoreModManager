@@ -151,6 +151,10 @@ class ThunderstorePackageHandler {
             const dependencyArray = [];
 
             try {
+                let additions = [];
+                let updates = [];
+                let removals = [];
+
                 const installedPackages = this.thunderstorePackage.getInstalledPackages();
 
                 /**
@@ -169,8 +173,6 @@ class ThunderstorePackageHandler {
                 const filePath = path.join(process.env.MODPACK_FOLDER, manifestFileName);
                 const fileExists = fs.existsSync(filePath);
                 if (fileExists) {
-                    console.log(`[${path.basename(__filename)}] :: Manifest already exists, updating dependencies...`);
-
                     const manifestFileContent = fs.readFileSync(filePath, 'utf-8');
                     manifest = JSON.parse(manifestFileContent);
                 } else {
@@ -192,16 +194,18 @@ class ThunderstorePackageHandler {
                 if (configFolderExists) {
                     const configFolderHash = await this.getFolderHash(configFolder);
                     const currentConfigFolderHash = manifest.config_folder_hash || null;
-                    if (manifest.config_folder_hash !== configFolderHash) {
+                    if (currentConfigFolderHash !== configFolderHash) {
                         console.log(`[${path.basename(__filename)}] :: Config folder hash changed, updating manifest...`);
                         manifest.config_folder_hash = configFolderHash;
-                        if (currentConfigFolderHash) hasPatchChanges = true;
+                        updates.push("Config files");
+                        hasPatchChanges = true;
                     }
                 }
 
                 /**
                  * Create dependency array
                  */
+                console.log(`[${path.basename(__filename)}] :: Checking dependencies...`);
                 for (const packageName in installedPackages) {
                     if (packageName === manifest.name) continue;
 
@@ -215,8 +219,6 @@ class ThunderstorePackageHandler {
                 /** 
                  * Check if there are any changes
                  */
-                let additions = [];
-                let removals = [];
                 if (fileExists) {
                     additions = dependencyArray.filter(x => !manifest.dependencies.includes(x));
                     removals = manifest.dependencies.filter(x => !dependencyArray.includes(x));
@@ -269,7 +271,7 @@ class ThunderstorePackageHandler {
                  * Update the changelog
                  */
                 const changelog = new Changelog();
-                await changelog.updateChangelog(manifest.version_number, additions, removals);
+                await changelog.updateChangelog(manifest.version_number, { additions, updates, removals });
 
                 resolve();
             } catch (err) {

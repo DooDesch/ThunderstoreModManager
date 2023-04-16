@@ -26,14 +26,16 @@ export default class Changelog {
         });
     }
 
-    async updateChangelog(version, additions, removals) {
+    async updateChangelog(version, { additions, updates, removals }) {
         await this.init();
+
+        const changes = additions.length + updates.length + removals.length;
 
         if (version === "1.0.0") return new Promise((resolve) => { resolve(); });
         if (await this.versionExists(version)) return new Promise((resolve) => { resolve(); });
-        if (!additions.length && !removals.length) return new Promise((resolve) => { resolve(); });
+        if (!changes) return new Promise((resolve) => { resolve(); });
 
-        console.log(`[${path.basename(__filename)}] :: Updating changelog for version ${version}...`);
+        console.log(`[${path.basename(__filename)}] :: Updating changelog for version ${version}, adding ${changes} changes...`);
 
         let changelog = `## ${version}\n\n`;
 
@@ -41,6 +43,13 @@ export default class Changelog {
             changelog += "- Added:\n";
             for (const addition of additions) {
                 changelog += `  - ${addition}\n`;
+            }
+        }
+
+        if (updates.length > 0) {
+            changelog += "- Updated:\n";
+            for (const update of updates) {
+                changelog += `  - ${update}\n`;
             }
         }
 
@@ -54,6 +63,7 @@ export default class Changelog {
         this.changelog = `${changelog}\n${this.changelog}`;
 
         return new Promise((resolve) => {
+            console.log(`[${path.basename(__filename)}] :: Writing changelog to file...`);
             fs.writeFile(path.join(process.env.MODPACK_FOLDER, 'CHANGELOG.md'), this.changelog, (error) => {
                 if (error) {
                     console.error(error);
