@@ -198,7 +198,7 @@ class Action {
                     await this.updatePackageByName(packageName, download);
                     break;
                 case 'removePackageByName':
-                    await this.remove(packageName);
+                    await this.removePackageByName(packageName);
                     break;
                 case 'createManifest':
                     await this.createManifest();
