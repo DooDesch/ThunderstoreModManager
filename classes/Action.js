@@ -164,7 +164,7 @@ class Action {
                     type: 'input',
                     name: 'packageName',
                     message: 'Enter the name of the package to remove:',
-                    when: (answers) => answers.action === 'remove', // only ask this question if the "remove" option is selected
+                    when: (answers) => answers.action === 'removePackageByName', // only ask this question if the "remove" option is selected
                 },
                 {
                     type: 'confirm',
