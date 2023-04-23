@@ -106,12 +106,12 @@ class Utils {
     static getAuthorNameVersionFromPackageString = (packageString) => {
         const splittedString = packageString.split('-');
         const version = splittedString.pop();
-        const author = splittedString.pop();
-        const name = splittedString.join('-');
+        const name = splittedString.pop();
+        const author = splittedString.join('-');
 
         return {
-            name,
             author,
+            name,
             version,
         };
     };

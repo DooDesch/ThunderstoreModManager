@@ -144,6 +144,6 @@ export default class Changelog {
         const mdLinkPrefix = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/package`;
         const mdVersion = version ? `-${version}` : '';
         const mdLinkName = `${author}-${name}${mdVersion}`;
-        return `[${mdLinkName}](${mdLinkPrefix}/${author}/${name})`;
+        return `[${mdLinkName}](${mdLinkPrefix}/${author}/${name}/${version})`;
     }
 }
