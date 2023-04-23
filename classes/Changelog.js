@@ -53,15 +53,18 @@ export default class Changelog {
             changelog += "- Added:\n";
             for (const addition of this.additions) {
                 const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(addition);
-                const mdLink = this.getMdLink(author, name, version);
-                changelog += `  - ${mdLink}\n`;
+                const additionString = this.getMdLink(author, name, version);
+                changelog += `  - ${additionString}\n`;
             }
         }
 
         if (this.updates.length > 0) {
             changelog += "- Updated:\n";
             for (const update of this.updates) {
-                changelog += `  - ${update}\n`;
+                const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(update);
+                const mdLink = this.getMdLink(author, name);
+                const updateString = `${mdLink} to version ${version}`;
+                changelog += `  - ${updateString}\n`;
             }
         }
 
@@ -69,8 +72,8 @@ export default class Changelog {
             changelog += "- Removed:\n";
             for (const removal of this.removals) {
                 const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(removal);
-                const mdLink = this.getMdLink(author, name, version);
-                changelog += `  - ${mdLink}\n`;
+                const removalString = this.getMdLink(author, name, version);
+                changelog += `  - ${removalString}\n`;
             }
         }
 
@@ -132,8 +135,8 @@ export default class Changelog {
 
         // Add all additions that are also removals to the updates array
         this.updates.push(...additionsAndRemovals.map((additionAndRemoval) => {
-            const mdLink = this.getMdLink(additionAndRemoval.author, additionAndRemoval.name);
-            return `${mdLink} to version ${additionAndRemoval.version}`;
+            const { author, name, version } = additionAndRemoval;
+            return `${author}-${name}-${version}`;
         }));
     }
 
