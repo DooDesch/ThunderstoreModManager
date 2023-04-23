@@ -55,13 +55,15 @@ class ThunderstorePackageHandler {
             const tsPackage = new Package(name, packageInfo.details);
             if (tsPackage.dependencies) {
                 for (const dependency in tsPackage.dependencies) {
-                    const regexPattern = /^[^-]+-([^-\d]+)-([\d\.]+)$/;
+                    // Test by getting last '-' and splitting it by '-' and getting the last element
+                    const splittedPackageName = tsPackage.dependencies[dependency].split('-');
+                    const version = splittedPackageName.pop();
+                    const name = splittedPackageName.pop();
 
-                    const match = tsPackage.dependencies[dependency].match(regexPattern);
-                    if (match) {
+                    if (version && name) {
                         const packageData = {
-                            name: match[1],
-                            version: match[2]
+                            name,
+                            version
                         }
 
                         await this.installPackageByName(packageData, download);
