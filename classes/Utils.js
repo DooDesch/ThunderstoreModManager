@@ -102,6 +102,19 @@ class Utils {
     }
 
     static sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    static getAuthorNameVersionFromPackageString = (packageString) => {
+        const splittedString = packageString.split('-');
+        const version = splittedString.pop();
+        const author = splittedString.pop();
+        const name = splittedString.join('-');
+
+        return {
+            name,
+            author,
+            version,
+        };
+    };
 }
 
 export default Utils;

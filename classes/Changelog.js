@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { fileURLToPath } from 'url';
+import Utils from '../classes/Utils.js';
 const __filename = fileURLToPath(import.meta.url);
 
 export default class Changelog {
@@ -51,7 +52,9 @@ export default class Changelog {
         if (this.additions.length > 0) {
             changelog += "- Added:\n";
             for (const addition of this.additions) {
-                changelog += `  - ${addition}\n`;
+                const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(addition);
+                const mdLink = this.getMdLink(author, name, version);
+                changelog += `  - ${mdLink}\n`;
             }
         }
 
@@ -65,7 +68,9 @@ export default class Changelog {
         if (this.removals.length > 0) {
             changelog += "- Removed:\n";
             for (const removal of this.removals) {
-                changelog += `  - ${removal}\n`;
+                const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(removal);
+                const mdLink = this.getMdLink(author, name, version);
+                changelog += `  - ${mdLink}\n`;
             }
         }
 
@@ -92,13 +97,13 @@ export default class Changelog {
     resolveAdditionsAndRemovals() {
         // Seperate author, name and version, which are seperated by a minus sign
         const additions = this.additions.map((addition) => {
-            const [author, name, version] = addition.split('-');
+            const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(addition);
             return { author, name, version };
         });
 
         // Seperate author, name and version, which are seperated by a minus sign
         const removals = this.removals.map((removal) => {
-            const [author, name, version] = removal.split('-');
+            const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(removal);
             return { author, name, version };
         });
 
@@ -112,20 +117,30 @@ export default class Changelog {
         // Remove all additions that are also removals
         this.additions = this.additions.filter((addition) => {
             return !additionsAndRemovals.some((additionAndRemoval) => {
-                return additionAndRemoval.name === addition.split('-')[1];
+                const { name } = Utils.getAuthorNameVersionFromPackageString(addition);
+                return additionAndRemoval.name === name;
             });
         });
 
         // Remove all removals that are also additions
         this.removals = this.removals.filter((removal) => {
             return !additionsAndRemovals.some((additionAndRemoval) => {
-                return additionAndRemoval.name === removal.split('-')[1];
+                const { name } = Utils.getAuthorNameVersionFromPackageString(removal);
+                return additionAndRemoval.name === name;
             });
         });
 
         // Add all additions that are also removals to the updates array
         this.updates.push(...additionsAndRemovals.map((additionAndRemoval) => {
-            return `${additionAndRemoval.author}-${additionAndRemoval.name} to version ${additionAndRemoval.version}`;
+            const mdLink = this.getMdLink(additionAndRemoval.author, additionAndRemoval.name);
+            return `${mdLink} to version ${additionAndRemoval.version}`;
         }));
+    }
+
+    getMdLink(author, name, version = null) {
+        const mdLinkPrefix = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/package`;
+        const mdVersion = version ? `-${version}` : '';
+        const mdLinkName = `${author}-${name}${mdVersion}`;
+        return `[${mdLinkName}](${mdLinkPrefix}/${author}/${name})`;
     }
 }
