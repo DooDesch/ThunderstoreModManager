@@ -1,8 +1,9 @@
 import PackageUpdater from '../thunderstore/PackageUpdater.js';
 import ThunderstorePackageHandler from './ThunderstorePackageHandler.js';
 import Modpack from './Modpack.js';
+import Utils from './Utils.js';
 import inquirer from 'inquirer';
-import fs from 'fs';
+import { exec } from 'child_process';
 
 class Action {
     constructor() {
@@ -108,7 +109,7 @@ class Action {
         this.packageUpdater = new PackageUpdater();
         this.thunderstorePackageHandler = new ThunderstorePackageHandler();
 
-        const lastInput = this.getLastInput();
+        const lastInput = Utils.getLastInput();
 
         return new Promise(async () => {
             const questions = [
@@ -194,7 +195,7 @@ class Action {
                 process.exit(0);
             }
 
-            this.setLastInputByActionName(actionName, packageName);
+            Utils.setLastInputByActionName(actionName, packageName);
 
             switch (actionName) {
                 case 'installAllPackages':
@@ -213,31 +214,26 @@ class Action {
                     break;
                 case 'createModpack':
                     await this.createModpack(updateManifest);
+
+                    // Ask to open the dist folder
+                    const openDistFolder = await inquirer.prompt([
+                        {
+                            type: 'confirm',
+                            name: 'openDistFolder',
+                            message: 'Do you want to open the dist folder?',
+                            default: true,
+                        },
+                    ]);
+
+                    if (openDistFolder.openDistFolder) {
+                        new exec('start "" dist');
+                    }
                     break;
             }
 
             // Ask again
             return await this.start();
         });
-    }
-
-    getLastInput() {
-        if (!fs.existsSync('./cache/lastInput.json')) {
-            fs.writeFileSync('./cache/lastInput.json', JSON.stringify({}));
-        }
-
-        const lastInput = fs.readFileSync('./cache/lastInput.json', 'utf8');
-
-        return JSON.parse(lastInput);
-    }
-
-    setLastInputByActionName(actionName, input) {
-        const lastInput = {
-            ...this.getLastInput(),
-            [actionName]: input,
-        }
-
-        fs.writeFileSync('./cache/lastInput.json', JSON.stringify(lastInput));
     }
 }
 

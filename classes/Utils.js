@@ -115,6 +115,25 @@ class Utils {
             version,
         };
     };
+
+    static getLastInput() {
+        if (!fs.existsSync('./cache/lastInput.json')) {
+            fs.writeFileSync('./cache/lastInput.json', JSON.stringify({}));
+        }
+
+        const lastInput = fs.readFileSync('./cache/lastInput.json', 'utf8');
+
+        return JSON.parse(lastInput);
+    }
+
+    static setLastInputByActionName(actionName, input) {
+        const lastInput = {
+            ...this.getLastInput(),
+            [actionName]: input,
+        }
+
+        fs.writeFileSync('./cache/lastInput.json', JSON.stringify(lastInput));
+    }
 }
 
 export default Utils;
