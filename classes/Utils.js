@@ -134,6 +134,10 @@ class Utils {
 
         fs.writeFileSync('./cache/lastInput.json', JSON.stringify(lastInput));
     }
+
+    static clearLastInput() {
+        fs.rmSync('./cache/lastInput.json');
+    }
 }
 
 export default Utils;

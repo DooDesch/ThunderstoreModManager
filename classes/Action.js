@@ -113,6 +113,8 @@ class Action {
             const currentPackages = new CurrentPackages();
             await currentPackages.clearPackages();
 
+            Utils.clearLastInput();
+
             resolve();
         });
     }
