@@ -62,7 +62,7 @@ export default class Changelog {
             changelog += "- Updated:\n";
             for (const update of this.updates) {
                 const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(update);
-                const mdLink = this.getMdLink(author, name);
+                const mdLink = this.getMdLink(author, name, version);
                 const updateString = `${mdLink} to version ${version}`;
                 changelog += `  - ${updateString}\n`;
             }
@@ -144,6 +144,6 @@ export default class Changelog {
         const mdLinkPrefix = `https://${process.env.GAME.toLowerCase()}.thunderstore.io/package`;
         const mdVersion = version ? `-${version}` : '';
         const mdLinkName = `${author}-${name}${mdVersion}`;
-        return `[${mdLinkName}](${mdLinkPrefix}/${author}/${name}/${version})`;
+        return `[${mdLinkName}](${mdLinkPrefix}/${author}/${name}/${version ? version : ''})`;
     }
 }

@@ -25,7 +25,7 @@ class Package {
     }
 
     async downloadPackage(url = this.downloadUrl, retryCount = this.maxRetryCount) {
-        const packageAlreadyDownloaded = await this.packageAlreadyDownloaded();
+        const packageAlreadyDownloaded = await this.packageAlreadyDownloaded(retryCount);
         if (packageAlreadyDownloaded) {
             return true;
         }
@@ -74,7 +74,12 @@ class Package {
         }
     }
 
-    async packageAlreadyDownloaded() {
+    /**
+     * Checks if the package is already downloaded
+     * 
+     * @returns {Promise<boolean>}
+     */
+    async packageAlreadyDownloaded(retryCount) {
         const access = promisify(fs.access);
 
         try {
@@ -88,7 +93,9 @@ class Package {
             process.stdout.write(`[${path.basename(__filename)}] :: ${this.fullName} is already up-to-date...\r`);
             return true;
         } catch (error) {
-            process.stdout.write(`[${path.basename(__filename)}] :: Downloading ${this.fullName} now...\r`);
+            const retryPluralString = retryCount > 1 ? 'retries' : 'retry';
+            const retryString = retryCount < this.maxRetryCount ? `${retryCount} ${retryPluralString} left...` : '';
+            process.stdout.write(`[${path.basename(__filename)}] :: Downloading ${this.fullName} now... ${retryString}\r`);
             return false;
         }
     }
