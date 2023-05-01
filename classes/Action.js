@@ -2,6 +2,7 @@ import PackageUpdater from '../thunderstore/PackageUpdater.js';
 import ThunderstorePackageHandler from './ThunderstorePackageHandler.js';
 import Modpack from './Modpack.js';
 import inquirer from 'inquirer';
+import fs from 'fs';
 
 class Action {
     constructor() {
@@ -107,6 +108,8 @@ class Action {
         this.packageUpdater = new PackageUpdater();
         this.thunderstorePackageHandler = new ThunderstorePackageHandler();
 
+        const lastInput = this.getLastInput();
+
         return new Promise(async () => {
             const questions = [
                 {
@@ -152,18 +155,21 @@ class Action {
                     type: 'input',
                     name: 'packageName',
                     message: 'Enter the name of the package to install:',
+                    default: lastInput.installPackageByName || null,
                     when: (answers) => ['installPackageByName'].includes(answers.action), // only ask this question if the "install" option is selected
                 },
                 {
                     type: 'input',
                     name: 'packageName',
                     message: 'Enter the name of the package to update:',
+                    default: lastInput.updatePackageByName || null,
                     when: (answers) => ['updatePackageByName'].includes(answers.action), // only ask this question if the "install" option is selected
                 },
                 {
                     type: 'input',
                     name: 'packageName',
                     message: 'Enter the name of the package to remove:',
+                    default: lastInput.removePackageByName || null,
                     when: (answers) => answers.action === 'removePackageByName', // only ask this question if the "remove" option is selected
                 },
                 {
@@ -188,6 +194,8 @@ class Action {
                 process.exit(0);
             }
 
+            this.setLastInputByActionName(actionName, packageName);
+
             switch (actionName) {
                 case 'installAllPackages':
                 case 'installPackageByName':
@@ -211,6 +219,25 @@ class Action {
             // Ask again
             return await this.start();
         });
+    }
+
+    getLastInput() {
+        if (!fs.existsSync('./cache/lastInput.json')) {
+            fs.writeFileSync('./cache/lastInput.json', JSON.stringify({}));
+        }
+
+        const lastInput = fs.readFileSync('./cache/lastInput.json', 'utf8');
+
+        return JSON.parse(lastInput);
+    }
+
+    setLastInputByActionName(actionName, input) {
+        const lastInput = {
+            ...this.getLastInput(),
+            [actionName]: input,
+        }
+
+        fs.writeFileSync('./cache/lastInput.json', JSON.stringify(lastInput));
     }
 }
 

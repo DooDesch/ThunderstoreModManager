@@ -9,13 +9,16 @@ const __filename = fileURLToPath(import.meta.url);
 class Package {
     constructor(name, packageInfo) {
         const { versionNumber, dependencies, downloadUrl, fullName } = packageInfo;
+
         this.name = name;
         this.fullName = fullName;
         this.version = versionNumber;
         this.dependencies = dependencies;
         this.downloadUrl = downloadUrl;
 
-        this.directory = `./cache/downloads`;
+        this.cacheDirectory = `./cache`;
+
+        this.directory = `${this.cacheDirectory}/downloads`;
         this.fileName = `${this.fullName}-${this.version}.zip`;
         this.filePath = `${this.directory}/${this.fileName}`;
 
@@ -99,7 +102,6 @@ class Package {
             return false;
         }
     }
-
 
     createDirectoryIfNotExists() {
         if (!fs.existsSync(this.directory)) {
