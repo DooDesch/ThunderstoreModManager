@@ -22,4 +22,14 @@ export default class CurrentPackages {
             resolve(this.packages);
         });
     }
+
+    async clearPackages() {
+        await this.init();
+
+        return new Promise((resolve) => {
+            fs.rmSync('./cache/currentPackages.json');
+
+            resolve();
+        });
+    }
 }

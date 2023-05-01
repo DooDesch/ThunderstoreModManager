@@ -2,6 +2,7 @@ import PackageUpdater from '../thunderstore/PackageUpdater.js';
 import ThunderstorePackageHandler from './ThunderstorePackageHandler.js';
 import Modpack from './Modpack.js';
 import Utils from './Utils.js';
+import CurrentPackages from '../thunderstore/CurrentPackages.js';
 import inquirer from 'inquirer';
 import { exec } from 'child_process';
 
@@ -105,6 +106,17 @@ class Action {
         });
     }
 
+    clearCache() {
+        return new Promise(async (resolve) => {
+            await this.init();
+
+            const currentPackages = new CurrentPackages();
+            await currentPackages.clearPackages();
+
+            resolve();
+        });
+    }
+
     start() {
         this.packageUpdater = new PackageUpdater();
         this.thunderstorePackageHandler = new ThunderstorePackageHandler();
@@ -145,6 +157,10 @@ class Action {
                         {
                             name: 'Zip your modpack',
                             value: 'createModpack',
+                        },
+                        {
+                            name: 'Clear cache',
+                            value: 'clearCache',
                         },
                         {
                             name: 'Exit',
@@ -228,6 +244,9 @@ class Action {
                     if (openDistFolder.openDistFolder) {
                         new exec('start "" dist');
                     }
+                    break;
+                case 'clearCache':
+                    await this.clearCache();
                     break;
             }
 

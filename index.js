@@ -81,4 +81,13 @@ program
         await action.start();
     });
 
+program
+    .command('clear:cache')
+    .description('Clear the cache')
+    .action(async () => {
+        const action = new Action();
+        await action.init();
+        await action.clearCache();
+    });
+
 program.parse(process.argv);
