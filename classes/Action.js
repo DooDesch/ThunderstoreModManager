@@ -106,6 +106,17 @@ class Action {
         });
     }
 
+    rollbackModpack() {
+        return new Promise(async (resolve) => {
+            await this.init();
+
+            const modpack = new Modpack();
+            await modpack.rollbackModpack();
+
+            resolve();
+        });
+    }
+
     clearCache() {
         return new Promise(async (resolve) => {
             await this.init();
@@ -161,6 +172,10 @@ class Action {
                             value: 'createModpack',
                         },
                         {
+                            name: 'Rollback modpack',
+                            value: 'rollbackModpack',
+                        },
+                        {
                             name: 'Clear cache',
                             value: 'clearCache',
                         },
@@ -204,6 +219,13 @@ class Action {
                     message: 'Do you want to update the manifest file?',
                     default: true,
                     when: (answers) => answers.action === 'createModpack', // only ask this question if the "update" option is selected
+                },
+                {
+                    type: 'confirm',
+                    name: 'rollbackModpack',
+                    message: 'Do you really want to rollback the modpack? This will restore the current manifest.json and CHANGELOG.md!',
+                    default: false,
+                    when: (answers) => answers.action === 'rollbackModpack', // only ask this question if the "update" option is selected
                 }
             ];
 
@@ -247,6 +269,8 @@ class Action {
                         new exec('start "" dist');
                     }
                     break;
+                case 'rollbackModpack':
+                    await this.rollbackModpack();
                 case 'clearCache':
                     await this.clearCache();
                     break;

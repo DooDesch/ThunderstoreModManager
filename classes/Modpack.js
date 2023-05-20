@@ -12,11 +12,20 @@ class Modpack {
     iconFileName = "icon.png";
     readmeFileName = "README.md";
     manifestFileName = "manifest.json";
+    changelogFileName = "CHANGELOG.md";
     modpackDirectory = process.env.MODPACK_FOLDER || "./modpack";
+    cacheFolder = process.env.MODPACK_CACHE_FOLDER || "./cache/modpack";
+    manifest = {};
 
     constructor() {
         const manifestFileContent = fs.readFileSync(path.join(this.modpackDirectory, this.manifestFileName), 'utf-8');
         this.manifest = JSON.parse(manifestFileContent);
+
+        // Create cache folder if it doesn't exist
+        const directoryExists = fs.existsSync(this.cacheFolder);
+        if (!directoryExists) {
+            fs.mkdirSync(this.cacheFolder, { recursive: true });
+        }
     }
 
     async init() {
@@ -122,13 +131,58 @@ class Modpack {
                 const readmePath = path.join(this.modpackDirectory, this.readmeFileName);
                 const name = this.manifest.name.replaceAll("_", " ");
                 const description = this.manifest.description;
-                await Utils.generateReadme(name, description, readmePath);
+                Utils.generateReadme(name, description, readmePath);
 
                 return true;
             } else {
                 throw new Error(err);
             }
         }
+    }
+
+    backupManifest() {
+        return new Promise(async (resolve, reject) => {
+            const manifestBackupPath = path.join(this.cacheFolder, this.manifestFileName);
+            fs.copyFileSync(path.join(this.modpackDirectory, this.manifestFileName), manifestBackupPath);
+
+            console.log(`[${path.basename(__filename)}] :: Manifest backed up to ${manifestBackupPath}`);
+            resolve();
+        });
+    }
+
+    backupChangelog() {
+        return new Promise(async (resolve, reject) => {
+            const changelogBackupPath = path.join(this.cacheFolder, this.changelogFileName);
+            fs.copyFileSync(path.join(this.modpackDirectory, this.changelogFileName), changelogBackupPath);
+
+            console.log(`[${path.basename(__filename)}] :: Changelog backed up to ${changelogBackupPath}`);
+            resolve();
+        });
+    }
+
+    rollbackManifest() {
+        return new Promise(async (resolve, reject) => {
+            const manifestBackupPath = path.join(this.cacheFolder, this.manifestFileName);
+            fs.copyFileSync(manifestBackupPath, path.join(this.modpackDirectory, this.manifestFileName));
+
+            console.log(`[${path.basename(__filename)}] :: Manifest rolled back to ${manifestBackupPath}`);
+            resolve();
+        });
+    }
+
+    rollbackChangelog() {
+        return new Promise(async (resolve, reject) => {
+            const changelogBackupPath = path.join(this.cacheFolder, this.changelogFileName);
+            fs.copyFileSync(changelogBackupPath, path.join(this.modpackDirectory, this.changelogFileName));
+
+            console.log(`[${path.basename(__filename)}] :: Changelog rolled back to ${changelogBackupPath}`);
+            resolve();
+        });
+    }
+
+    async rollbackModpack() {
+        await this.rollbackManifest();
+        await this.rollbackChangelog();
     }
 }
 

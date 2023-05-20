@@ -5,6 +5,7 @@ import CurrentPackages from '../thunderstore/CurrentPackages.js';
 import PackageInfo from '../thunderstore/PackageInfo.js';
 import Package from '../thunderstore/Package.js';
 import Changelog from './Changelog.js';
+import Modpack from './Modpack.js';
 import inquirer from 'inquirer';
 import AdmZip from 'adm-zip';
 import crypto from 'crypto';
@@ -180,6 +181,11 @@ class ThunderstorePackageHandler {
                 const fileExists = fs.existsSync(filePath);
                 if (fileExists) {
                     const manifestFileContent = fs.readFileSync(filePath, 'utf-8');
+                    // Create a backup of the manifest file in the cache/modpack folder
+                    const modpack = new Modpack();
+                    await modpack.backupManifest();
+                    await modpack.backupChangelog();
+
                     manifest = JSON.parse(manifestFileContent);
                 } else {
                     manifest = {
