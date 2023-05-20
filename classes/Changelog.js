@@ -67,7 +67,7 @@ export default class Changelog {
                 }
 
                 const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(update);
-                const mdLink = this.getMdLink(author, name, version);
+                const mdLink = this.getMdLink(author, name);
                 const updateString = `${mdLink} to version ${version}`;
                 changelog += `  - ${updateString}\n`;
             }
