@@ -61,6 +61,11 @@ export default class Changelog {
         if (this.updates.length > 0) {
             changelog += "- Updated:\n";
             for (const update of this.updates) {
+                if (update === "Config files") {
+                    changelog += `  - ${update}\n`;
+                    continue;
+                }
+
                 const { author, name, version } = Utils.getAuthorNameVersionFromPackageString(update);
                 const mdLink = this.getMdLink(author, name, version);
                 const updateString = `${mdLink} to version ${version}`;
